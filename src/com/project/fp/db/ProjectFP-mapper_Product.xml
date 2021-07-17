@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.project.fp.product">
+
+	<select id="selectList" resultType="ProductDto">
+		SELECT p.PROD_NUM, p.PROD_NAME, p.PROD_EXPLAIN, p.PROD_SALE, p.PROD_PRICE, p.PROD_RECOMM, p.PROD_STOCK, p.PROD_CATEGORY, p.PROD_IN, p.PROD_OUT, p.PROD_INDATE, p.PROD_OUTDATE, p.PROD_MFR, p.PROD_CLIENT,f.file_new_name
+		FROM product p , file_table f 
+		WHERE p.prod_num = f.prod_num
+		ORDER BY p.PROD_NUM DESC
+	</select>
+	<select id="rank_list" resultType="ProductDto">
+	SELECT A.PROD_NUM
+	FROM (
+		SELECT PROD_NUM
+		FROM PRODUCT
+		ORDER BY PROD_OUT DESC
+		) A
+	WHERE ROWNUM <![CDATA[ < ]]> 6
+	</select>
+	
+	<select id="selectcategoryList" resultType="ProductDto">
+		SELECT p.PROD_NUM, p.PROD_NAME, p.PROD_EXPLAIN, p.PROD_SALE, p.PROD_PRICE, p.PROD_RECOMM, p.PROD_STOCK, p.PROD_CATEGORY, p.PROD_IN, p.PROD_OUT, p.PROD_INDATE, p.PROD_OUTDATE, p.PROD_MFR, p.PROD_CLIENT,f.file_new_name
+		FROM product p , file_table f 
+		WHERE p.PROD_CATEGORY = #{prod_category}
+		AND p.prod_num = f.prod_num
+		ORDER BY p.PROD_NUM DESC
+	</select>
+	
+	
+	
+	<select id="prod_selectone" resultType="ProductDto" parameterType="String">
+		SELECT p.PROD_NUM, p.PROD_NAME, p.PROD_EXPLAIN, p.PROD_SALE, p.PROD_PRICE, p.PROD_RECOMM, p.PROD_STOCK, p.PROD_CATEGORY, p.PROD_IN, p.PROD_OUT, p.PROD_INDATE, p.PROD_OUTDATE, p.PROD_MFR, p.PROD_CLIENT,f.file_new_name
+		FROM product p , file_table f 
+		WHERE p.PROD_name = #{prod_name}
+		AND p.prod_num = f.prod_num
+	</select>
+	
+	<select id="selectOne" resultType="ProductDto" parameterType="int">
+		SELECT p.PROD_NUM, p.PROD_NAME, p.PROD_EXPLAIN, p.PROD_SALE, p.PROD_PRICE, p.PROD_RECOMM, p.PROD_STOCK, p.PROD_CATEGORY, p.PROD_IN, p.PROD_OUT, p.PROD_INDATE, p.PROD_OUTDATE, p.PROD_MFR, p.PROD_CLIENT,f.file_new_name
+		FROM product p , file_table f 
+		WHERE p.PROD_NUM = #{prod_num}
+		AND p.prod_num = f.prod_num
+	</select>
+	
+	<select id="product_allCount" resultType="int">
+		SELECT COUNT(*)
+		FROM PRODUCT
+	</select>
+	
+	<select id="product_categoryCount" resultType="int">
+		SELECT COUNT(*)
+		FROM PRODUCT
+		WHERE PROD_CATEGORY = #{prod_category}
+	</select>
+	
+	<select id="product_selectList"
+		parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		select
+		b.rnum,b.prod_num,b.prod_name, b.prod_category, b.prod_price, b.file_new_name
+		from
+		(select rownum as rnum,
+		a.prod_num,a.prod_name,a.prod_category,a.prod_price,a.file_new_name
+		from
+		(select
+		p.prod_num, p.prod_name, p.prod_category, p.prod_price,f.file_new_name
+		from product p, file_table f
+		where p.prod_num = f.prod_num
+		order by p.prod_num desc)a
+		where rownum <![CDATA[ <= ]]>
+		#{pageEnd})b
+		where b.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>	
+	
+	<select id="product_search" parameterType="ProductDto"
+		resultType="ProductDto">
+		SELECT p.PROD_NUM, p.PROD_NAME, p.PROD_EXPLAIN, p.PROD_SALE, p.PROD_PRICE, p.PROD_RECOMM, p.PROD_STOCK, p.PROD_CATEGORY, p.PROD_IN, p.PROD_OUT, p.PROD_INDATE, p.PROD_OUTDATE, p.PROD_MFR, p.PROD_CLIENT,f.file_new_name
+		FROM product p , file_table f 
+		WHERE p.prod_name LIKE '%'||#{prod_name}||'%' 
+		and p.prod_num = f.prod_num
+		order by prod_num desc
+	</select>
+	
+	<select id="product_all_search"
+		parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		SELECT X.rnum,
+		X.PROD_NUM, X.PROD_NAME, X.PROD_EXPLAIN, X.PROD_SALE, X.PROD_PRICE, X.PROD_RECOMM, X.PROD_STOCK, X.PROD_CATEGORY, X.PROD_IN, X.PROD_OUT, X.PROD_INDATE, X.PROD_OUTDATE, X.PROD_MFR, X.PROD_CLIENT, X.FILE_NEW_NAME
+		FROM (
+		SELECT ROWNUM AS rnum,
+		A.PROD_NUM, A.PROD_NAME, A.PROD_EXPLAIN, A.PROD_SALE, A.PROD_PRICE, A.PROD_RECOMM, A.PROD_STOCK, A.PROD_CATEGORY, A.PROD_IN, A.PROD_OUT, A.PROD_INDATE, A.PROD_OUTDATE, A.PROD_MFR, A.PROD_CLIENT,A.file_new_name
+		FROM (
+		SELECT p.PROD_NUM, p.PROD_NAME, p.PROD_EXPLAIN, p.PROD_SALE, p.PROD_PRICE, p.PROD_RECOMM, p.PROD_STOCK, p.PROD_CATEGORY, p.PROD_IN, p.PROD_OUT, p.PROD_INDATE, p.PROD_OUTDATE, p.PROD_MFR, p.PROD_CLIENT,f.file_new_name
+		FROM product p, file_table f
+		WHERE p.prod_name  LIKE '%'||#{s_t}||'%'
+		and p.prod_num = f.prod_num
+		ORDER BY PROD_NUM DESC
+		) A
+		WHERE ROWNUM <![CDATA[ <= ]]>
+		#{pageEnd}
+		) X
+
+		WHERE X.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>
+	
+	<select id="feed_selectList" parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		select
+		b.rnum,b.prod_num,b.prod_name, prod_category, prod_price, file_new_name
+		from
+		(select rownum as rnum,
+		a.prod_num,a.prod_name,a.prod_category, a.prod_price, a.file_new_name
+		from
+		(select
+		p.prod_num, p.prod_name, p.prod_category, p.prod_price,f.file_new_name
+		from product p, file_table f
+		where p.PROD_CATEGORY = 'feed' and p.prod_num = f.prod_num
+		order by prod_num desc)a
+		where rownum <![CDATA[ <= ]]>
+		#{pageEnd})b
+		where b.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>	
+	
+		
+	<select id="care_selectList" parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		select
+		b.rnum,b.prod_num,b.prod_name, prod_category, prod_price, file_new_name
+		from
+		(select rownum as rnum,
+		a.prod_num,a.prod_name,a.prod_category, a.prod_price, a.file_new_name
+		from
+		(select
+		p.prod_num, p.prod_name, p.prod_category, p.prod_price,f.file_new_name
+		from product p, file_table f
+		where p.PROD_CATEGORY = 'care' and p.prod_num = f.prod_num
+		order by prod_num desc)a
+		where rownum <![CDATA[ <= ]]>
+		#{pageEnd})b
+		where b.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>	
+	
+	<select id="living_selectList" parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		select
+		b.rnum,b.prod_num,b.prod_name, prod_category, prod_price, file_new_name
+		from
+		(select rownum as rnum,
+		a.prod_num,a.prod_name,a.prod_category, a.prod_price, a.file_new_name
+		from
+		(select
+		p.prod_num, p.prod_name, p.prod_category, p.prod_price,f.file_new_name
+		from product p, file_table f
+		where p.PROD_CATEGORY = 'living' and p.prod_num = f.prod_num
+		order by prod_num desc)a
+		where rownum <![CDATA[ <= ]]>
+		#{pageEnd})b
+		where b.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>	
+	
+	
+	<select id="outing_selectList" parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		select
+		b.rnum,b.prod_num,b.prod_name, prod_category, prod_price, file_new_name
+		from
+		(select rownum as rnum,
+		a.prod_num,a.prod_name,a.prod_category, a.prod_price, a.file_new_name
+		from
+		(select
+		p.prod_num, p.prod_name, p.prod_category, p.prod_price,f.file_new_name
+		from product p, file_table f
+		where p.PROD_CATEGORY = 'outing' and p.prod_num = f.prod_num
+		order by prod_num desc)a
+		where rownum <![CDATA[ <= ]]>
+		#{pageEnd})b
+		where b.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>	
+
+	
+	<select id="toy_selectList" parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		select
+		b.rnum,b.prod_num,b.prod_name, prod_category, prod_price, file_new_name
+		from
+		(select rownum as rnum,
+		a.prod_num,a.prod_name,a.prod_category, a.prod_price, a.file_new_name
+		from
+		(select
+		p.prod_num, p.prod_name, p.prod_category, p.prod_price,f.file_new_name
+		from product p, file_table f
+		where p.PROD_CATEGORY = 'toy' and p.prod_num = f.prod_num
+		order by prod_num desc)a
+		where rownum <![CDATA[ <= ]]>
+		#{pageEnd})b
+		where b.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>	
+	
+		
+	<select id="fashion_selectList" parameterType="com.project.fp.dto.PagingDto" resultType="ProductDto">
+		select
+		b.rnum,b.prod_num,b.prod_name, prod_category, prod_price, file_new_name
+		from
+		(select rownum as rnum,
+		a.prod_num,a.prod_name,a.prod_category, a.prod_price, a.file_new_name
+		from
+		(select
+		p.prod_num, p.prod_name, p.prod_category, p.prod_price,f.file_new_name
+		from product p, file_table f
+		where p.PROD_CATEGORY = 'fashion' and p.prod_num = f.prod_num
+		order by prod_num desc)a
+		where rownum <![CDATA[ <= ]]>
+		#{pageEnd})b
+		where b.rnum <![CDATA[ >= ]]>
+		#{pageBegin}
+	</select>	
+	
+	<insert id="insert" parameterType="ProductDto">
+		INSERT INTO PRODUCT
+		VALUES(PRODUCT_NUM_SEQ.NEXTVAL, #{prod_name}, #{prod_explain}, #{prod_sale}, #{prod_price},1, #{prod_stock}, #{prod_category}, #{prod_stock}, null, sysdate, null, #{prod_mfr}, #{prod_client})
+	</insert>
+	
+	
+	
+	<update id="update" parameterType="ProductDto">
+		UPDATE PRODUCT
+		SET PROD_NAME = #{prod_name}, PROD_EXPLAIN = #{prod_explain}, PROD_SALE = #{prod_sale}, PROD_PRICE = #{prod_price}, PROD_RECOMM = #{prod_recomm}, PROD_STOCK = #{prod_stock}, PROD_CATEGORY = #{prod_category}, PROD_IN = #{prod_in}, PROD_OUT = #{prod_out}, PROD_INDATE = #{prod_indate}, PROD_OUTDATE = #{prod_outdate}, PROD_MFR = #{prod_mfr}, PROD_CLIENT = #{prod_client}
+		WHERE PROD_NUM = #{prod_num}
+	</update>
+	
+	<update id="pay_update" parameterType="ProductDto">
+		UPDATE PRODUCT
+		SET PROD_STOCK = #{prod_stock}, PROD_OUT = #{prod_out}, PROD_OUTDATE = SYSDATE
+		WHERE PROD_NUM = #{prod_num}
+	</update>
+	
+	<delete id="delete" parameterType="ProductDto">
+		DELETE FROM PRODUCT
+		WHERE PROD_NUM = #{prod_num}
+	</delete>
+	
+	<delete id="multiDelete" parameterType="map">
+		delete from product
+		where prod_num in
+		<foreach collection="prod_nums" item="prod_num" open="("
+			separator="," close=")">
+			#{prod_num}
+		</foreach>
+	</delete>
+</mapper>
