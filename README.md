@@ -23,8 +23,7 @@
 ​	이수연, 김현정, 남민혁, 한동규, 최태준
 
 
-> **발표 자료**
-​  [발표자료](https://github.com/happyeon/Project_FamilyPet/blob/master/presentation.pdf)
+> [발표자료](https://github.com/happyeon/Project_FamilyPet/blob/master/presentation.pdf)
 
 
 > **주제 선정 배경**
