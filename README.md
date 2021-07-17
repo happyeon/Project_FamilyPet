@@ -10,7 +10,7 @@
 
 ​	Family | pet
 
-[발표자료](#../presentation.pdf)
+[발표자료](https://github.com/happyeon/Project_FamilyPet/blob/master/presentation.pdf)
 
 > **개발 기간**
 
